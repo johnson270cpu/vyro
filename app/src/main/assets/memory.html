@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memory</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #14141f; color: #eee; font-family: system-ui, sans-serif; padding: 16px; text-align: center; }
+  #grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 360px; margin: 14px auto; }
+  .card { aspect-ratio: 1; border-radius: 12px; background: #22223a; font-size: 32px;
+          display: flex; align-items: center; justify-content: center; user-select: none; }
+  .card.open { background: #8a2f55; }
+  .card.done { background: #4a1d36; opacity: .6; }
+  button { padding: 10px 22px; border: 0; border-radius: 10px; background: #FF5C93; color: #1A0510; font-weight: 700; }
+</style>
+</head>
+<body>
+  <h2>Memory</h2>
+  <div>Moves: <b id="moves">0</b></div>
+  <div id="grid"></div>
+  <div id="msg" style="min-height:24px;color:#FF5C93"></div>
+  <button onclick="start()">New game</button>
+<script>
+var icons = ['🍎','🍌','🍇','🍒','🥭','🍍','🍉','🥝'];
+var first = null, lock = false, moves = 0, found = 0;
+
+function start() {
+  var deck = icons.concat(icons).sort(function () { return Math.random() - 0.5; });
+  var grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  moves = 0; found = 0; first = null; lock = false;
+  document.getElementById('moves').textContent = 0;
+  document.getElementById('msg').textContent = '';
+  deck.forEach(function (ic) {
+    var d = document.createElement('div');
+    d.className = 'card';
+    d.dataset.icon = ic;
+    d.onclick = function () { flip(d); };
+    grid.appendChild(d);
+  });
+}
+function flip(d) {
+  if (lock || d.classList.contains('open') || d.classList.contains('done')) return;
+  d.classList.add('open');
+  d.textContent = d.dataset.icon;
+  if (!first) { first = d; return; }
+  moves++;
+  document.getElementById('moves').textContent = moves;
+  if (first.dataset.icon === d.dataset.icon) {
+    first.classList.replace('open', 'done');
+    d.classList.replace('open', 'done');
+    first = null; found++;
+    if (found === icons.length) document.getElementById('msg').textContent = 'You won in ' + moves + ' moves!';
+  } else {
+    lock = true;
+    var a = first, b = d;
+    first = null;
+    setTimeout(function () {
+      a.classList.remove('open'); b.classList.remove('open');
+      a.textContent = ''; b.textContent = '';
+      lock = false;
+    }, 700);
+  }
+}
+start();
+</script>
+</body>
+</html>

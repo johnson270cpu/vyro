@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vyro</title>
+<style>
+  :root { --bg:#0E0B1F; --card:#181330; --text:#F2F3FA; --muted:#8D90B0; --accent:#FF5C93; --on:#1A0510; }
+  :root[data-theme="light"] { --bg:#F4F5FB; --card:#FFFFFF; --text:#14152A; --muted:#6B6E8C; --accent:#E0356F; --on:#FFFFFF; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,sans-serif; padding:22px 16px 28px; }
+  .top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo svg { width:38px; height:38px; }
+  h1 { margin:0; font-size:26px; letter-spacing:.5px; }
+  .date { text-align:right; color:var(--muted); font-size:12px; line-height:1.35; }
+  .date b { display:block; color:var(--text); font-size:14px; }
+  form { display:flex; gap:8px; margin-bottom:18px; }
+  input { flex:1; min-width:0; padding:14px 18px; border-radius:26px; border:0; font-size:16px;
+          background:var(--card); color:var(--text); outline:none; }
+  button.go { padding:0 20px; border:0; border-radius:26px; background:var(--accent);
+              color:var(--on); font-weight:700; font-size:16px; }
+  .quick { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:22px; }
+  .quick a { display:flex; flex-direction:column; align-items:center; gap:7px; padding:14px 4px;
+             border-radius:18px; background:var(--card); color:var(--text); text-decoration:none;
+             font-size:12px; font-weight:600; }
+  .quick svg { width:26px; height:26px; stroke:var(--accent); fill:none; stroke-width:2;
+               stroke-linecap:round; stroke-linejoin:round; }
+  h2 { margin:0 0 10px; font-size:18px; }
+  .chips { display:flex; gap:8px; overflow-x:auto; padding-bottom:12px; }
+  .chip { flex:none; padding:8px 14px; border-radius:20px; background:var(--card); color:var(--muted);
+          font-size:13px; font-weight:600; border:0; }
+  .chip.on { background:var(--accent); color:var(--on); }
+  a.hero, a.row { display:block; text-decoration:none; color:var(--text); background:var(--card);
+                  border-radius:18px; overflow:hidden; margin-bottom:12px; }
+  a.hero img { width:100%; height:190px; object-fit:cover; display:block; background:#00000022; }
+  .hero .body { padding:12px 14px 14px; }
+  .hero .tt { font-size:18px; font-weight:700; line-height:1.25; }
+  a.row { display:flex; gap:12px; padding:10px; align-items:stretch; }
+  .row img { width:104px; height:78px; object-fit:cover; border-radius:12px; flex:none; background:#00000022; }
+  .row .body { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; }
+  .row .tt { font-size:15px; font-weight:600; line-height:1.28; }
+  .meta { margin-top:6px; color:var(--muted); font-size:12px; }
+  .ds { margin-top:6px; color:var(--muted); font-size:13px; line-height:1.35; }
+  .state { color:var(--muted); text-align:center; padding:30px 10px; }
+  footer { margin-top:26px; text-align:center; color:var(--muted); font-size:12px; line-height:1.6; }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="logo">
+      <svg viewBox="0 0 108 108">
+        <rect width="108" height="108" rx="26" fill="#150F2E"/>
+        <path d="M28,32H42L54,63V80H47Z" fill="#F4F1FF"/>
+        <path d="M80,32H66L54,63V80H61Z" fill="#FF5C93"/>
+        <circle cx="54" cy="33" r="6" fill="#FFD166"/>
+      </svg>
+      <h1>Vyro</h1>
+    </div>
+    <div class="date"><span id="greet"></span><b id="today"></b></div>
+  </div>
+
+  <form onsubmit="go(event)">
+    <input id="q" placeholder="Search the web" autocomplete="off">
+    <button class="go">Go</button>
+  </form>
+
+  <div class="quick">
+    <a href="vyro://media">
+      <svg viewBox="0 0 24 24"><path d="M7,4H17A3,3 0 0 1 20,7V17A3,3 0 0 1 17,20H7A3,3 0 0 1 4,17V7A3,3 0 0 1 7,4Z"/><path d="M10.2,8.8L15,12L10.2,15.2Z"/></svg>
+      Media</a>
+    <a href="vyro://vault">
+      <svg viewBox="0 0 24 24"><path d="M12,3L19,6V12C19,16.5 16,19.5 12,21C8,19.5 5,16.5 5,12V6Z"/><path d="M10,12.2H14V15.6H10ZM10.7,12.2V11A1.3,1.3 0 0 1 13.3,11V12.2"/></svg>
+      Vault</a>
+    <a href="games.html" id="gamesLink">
+      <svg viewBox="0 0 24 24"><path d="M7,8H17A4,4 0 0 1 21,12V14A3,3 0 0 1 15,15L14.2,14H9.8L9,15A3,3 0 0 1 3,14V12A4,4 0 0 1 7,8Z"/><path d="M8,10.6V13.4M6.6,12H9.4M16,11.2H16.01M18,13H18.01"/></svg>
+      Games</a>
+    <a href="vyro://settings">
+      <svg viewBox="0 0 24 24"><path d="M4,6H9M15,6H20M4,12H13M19,12H20M4,18H5M11,18H20"/><path d="M12,6m-3,0a3,3 0 1 0 6,0a3,3 0 1 0 -6,0M16,12m-3,0a3,3 0 1 0 6,0a3,3 0 1 0 -6,0M8,18m-3,0a3,3 0 1 0 6,0a3,3 0 1 0 -6,0"/></svg>
+      Settings</a>
+  </div>
+
+  <section id="newsBox">
+    <h2>Today's news</h2>
+    <div class="chips" id="chips"></div>
+    <div id="news"><div class="state">Loading the latest news...</div></div>
+  </section>
+
+  <footer>Vyro &middot; Made by Yoolan<br>News from BBC feeds</footer>
+
+<script>
+var params = new URLSearchParams(location.search);
+document.documentElement.setAttribute('data-theme', params.get('theme') === 'light' ? 'light' : 'dark');
+var engine = params.get('engine') || 'https://duckduckgo.com/?q=';
+document.getElementById('gamesLink').href = 'games.html' + location.search;
+if (params.get('news') === '0') document.getElementById('newsBox').style.display = 'none';
+
+var now = new Date();
+var h = now.getHours();
+document.getElementById('greet').textContent = h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening');
+document.getElementById('today').textContent = now.toLocaleDateString(undefined, {weekday:'long', day:'numeric', month:'long'});
+
+function go(e) {
+  e.preventDefault();
+  var v = document.getElementById('q').value.trim();
+  if (!v) return;
+  if (v.indexOf(' ') < 0 && v.indexOf('.') > 0) { location.href = 'https://' + v.replace(/^https?:\/\//, ''); return; }
+  location.href = engine + encodeURIComponent(v);
+}
+
+var TOPICS = [['top','Top'],['africa','Africa'],['swahili','Swahili'],['tech','Tech'],['sport','Sport']];
+var data = null, cat = 'top';
+var chipsEl = document.getElementById('chips');
+var newsEl = document.getElementById('news');
+
+TOPICS.forEach(function (t) {
+  var b = document.createElement('button');
+  b.className = 'chip' + (t[0] === cat ? ' on' : '');
+  b.textContent = t[1];
+  b.onclick = function () {
+    cat = t[0];
+    Array.prototype.forEach.call(chipsEl.children, function (c) { c.className = 'chip'; });
+    b.className = 'chip on';
+    draw();
+  };
+  chipsEl.appendChild(b);
+});
+
+function el(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text) e.textContent = text;
+  return e;
+}
+
+function picture(a) {
+  if (!a.i) return null;
+  var img = document.createElement('img');
+  img.loading = 'lazy';
+  img.alt = '';
+  img.src = a.i;
+  img.onerror = function () {
+    if (a.i0 && img.src !== a.i0) { img.src = a.i0; } else { img.style.display = 'none'; }
+  };
+  return img;
+}
+
+function draw() {
+  var list = (data && data[cat]) || [];
+  newsEl.innerHTML = '';
+  if (!list.length) { newsEl.appendChild(el('div', 'state', 'No stories here right now.')); return; }
+  list.forEach(function (a, i) {
+    var card = document.createElement('a');
+    card.href = a.l;
+    card.className = i === 0 ? 'hero' : 'row';
+    var pic = picture(a);
+    var body = el('div', 'body');
+    body.appendChild(el('div', 'tt', a.t));
+    if (i === 0 && a.d) body.appendChild(el('div', 'ds', a.d));
+    body.appendChild(el('div', 'meta', a.s + (a.a ? ' · ' + a.a : '')));
+    if (i === 0) {
+      if (pic) card.appendChild(pic);
+      card.appendChild(body);
+    } else {
+      card.appendChild(body);
+      if (pic) card.appendChild(pic);
+    }
+    newsEl.appendChild(card);
+  });
+}
+
+window.renderNews = function (json) {
+  try { data = JSON.parse(json); } catch (e) { return; }
+  draw();
+};
+window.newsFailed = function () {
+  if (!data) {
+    newsEl.innerHTML = '';
+    newsEl.appendChild(el('div', 'state', 'Couldn’t load the news. Check your internet connection.'));
+  }
+};
+</script>
+</body>
+</html>
