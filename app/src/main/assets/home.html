@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Vyro</title>
+<style>
+  :root { --bg:#0E0B1F; --card:#181330; --text:#F2F3FA; --muted:#8D90B0; --accent:#FF5C93; --on:#1A0510; --line:#ffffff14; }
+  :root[data-theme="light"] { --bg:#F4F5FB; --card:#FFFFFF; --text:#14152A; --muted:#6B6E8C; --accent:#E0356F; --on:#FFFFFF; --line:#00000012; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,sans-serif; padding:20px 0 30px; }
+  .pad { padding:0 16px; }
+  .top { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo svg { width:40px; height:40px; }
+  h1 { margin:0; font-size:27px; letter-spacing:.5px; }
+  .date { text-align:right; color:var(--muted); font-size:13px; line-height:1.35; }
+  .date b { display:block; color:var(--text); font-size:15px; }
+  form { display:flex; gap:8px; margin-bottom:16px; }
+  input { flex:1; min-width:0; padding:15px 20px; border-radius:28px; border:0; font-size:16px;
+          background:var(--card); color:var(--text); outline:none; box-shadow:0 1px 0 var(--line) inset; }
+  button.go { padding:0 22px; border:0; border-radius:28px; background:var(--accent);
+              color:var(--on); font-weight:700; font-size:16px; }
+
+  .weather { display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:22px; margin-bottom:18px;
+             background:linear-gradient(135deg,#FF5C93,#7B5CFF); color:#fff; }
+  .weather .ic { font-size:38px; line-height:1; }
+  .weather .t { font-size:30px; font-weight:800; line-height:1; }
+  .weather .c { font-size:13px; opacity:.92; margin-top:4px; }
+  .weather .r { margin-left:auto; text-align:right; font-size:12px; opacity:.9; line-height:1.5; }
+
+  .sec { display:flex; align-items:baseline; justify-content:space-between; margin:4px 0 10px; }
+  h2 { margin:0; font-size:19px; }
+  .sites { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:22px; }
+  .sites a { display:flex; flex-direction:column; align-items:center; gap:7px; padding:12px 2px; border-radius:18px;
+             background:var(--card); color:var(--text); text-decoration:none; font-size:12px; font-weight:600; }
+  .sites .dot { width:42px; height:42px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+                font-size:19px; font-weight:800; color:#fff; }
+  .quick { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:22px; }
+  .quick a { display:flex; flex-direction:column; align-items:center; gap:7px; padding:14px 4px;
+             border-radius:18px; background:var(--card); color:var(--text); text-decoration:none;
+             font-size:12px; font-weight:600; }
+  .quick svg { width:28px; height:28px; stroke:var(--accent); fill:none; stroke-width:2;
+               stroke-linecap:round; stroke-linejoin:round; }
+
+  .chips { display:flex; gap:8px; overflow-x:auto; padding:0 16px 14px; scrollbar-width:none; }
+  .chips::-webkit-scrollbar { display:none; }
+  .chip { flex:none; padding:9px 16px; border-radius:22px; background:var(--card); color:var(--muted);
+          font-size:14px; font-weight:600; border:0; }
+  .chip.on { background:var(--accent); color:var(--on); }
+
+  .hero { display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; padding:0 16px 14px; scrollbar-width:none; }
+  .hero::-webkit-scrollbar { display:none; }
+  a.slide { position:relative; flex:none; width:86%; height:240px; border-radius:24px; overflow:hidden; scroll-snap-align:center;
+            display:block; text-decoration:none; color:#fff; background:#333; }
+  a.slide img, .ph { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .shade { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,0) 100%); }
+  .cap { position:absolute; left:0; right:0; bottom:0; padding:16px; }
+  .tag { display:inline-block; padding:3px 10px; border-radius:10px; background:var(--accent); color:var(--on);
+         font-size:11px; font-weight:700; margin-bottom:8px; }
+  .cap .tt { font-size:19px; font-weight:800; line-height:1.25; text-shadow:0 1px 6px rgba(0,0,0,.5); }
+  .cap .meta { margin-top:6px; font-size:12px; opacity:.85; }
+
+  .list { padding:0 16px; }
+  a.row { display:flex; gap:12px; padding:10px; align-items:stretch; margin-bottom:12px; text-decoration:none;
+          color:var(--text); background:var(--card); border-radius:20px; }
+  .thumb { position:relative; width:112px; height:92px; border-radius:14px; overflow:hidden; flex:none; }
+  .row .body { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; }
+  .row .tt { font-size:15px; font-weight:700; line-height:1.28; display:-webkit-box; -webkit-line-clamp:3;
+             -webkit-box-orient:vertical; overflow:hidden; }
+  .meta2 { margin-top:7px; color:var(--muted); font-size:12px; }
+  .state { color:var(--muted); text-align:center; padding:30px 10px; }
+  .sk { height:92px; border-radius:20px; margin-bottom:12px;
+        background:linear-gradient(90deg,var(--card) 25%,var(--line) 50%,var(--card) 75%); background-size:200% 100%;
+        animation:sh 1.3s infinite linear; }
+  .skh { height:240px; width:86%; flex:none; border-radius:24px; background:inherit; }
+  @keyframes sh { to { background-position:-200% 0; } }
+  footer { margin-top:22px; text-align:center; color:var(--muted); font-size:12px; line-height:1.6; }
+</style>
+</head>
+<body>
+  <div class="pad">
+    <div class="top">
+      <div class="logo">
+        <svg viewBox="0 0 108 108">
+          <rect width="108" height="108" rx="26" fill="#150F2E"/>
+          <path d="M28,32H42L54,63V80H47Z" fill="#F4F1FF"/>
+          <path d="M80,32H66L54,63V80H61Z" fill="#FF5C93"/>
+          <circle cx="54" cy="33" r="6" fill="#FFD166"/>
+        </svg>
+        <h1>Vyro</h1>
+      </div>
+      <div class="date"><span id="greet"></span><b id="today"></b></div>
+    </div>
+
+    <form onsubmit="go(event)">
+      <input id="q" placeholder="Search the web" autocomplete="off">
+      <button class="go">Go</button>
+    </form>
+
+    <div class="weather" id="wx" style="display:none">
+      <div class="ic" id="wxIc"></div>
+      <div><div class="t" id="wxT"></div><div class="c" id="wxC"></div></div>
+      <div class="r" id="wxR"></div>
+    </div>
+
+    <div class="sec"><h2>Favourites</h2></div>
+    <div class="sites" id="sites"></div>
+  </div>
+
+  <section id="newsBox">
+    <div class="pad"><div class="sec"><h2>Today's news</h2></div></div>
+    <div class="chips" id="chips"></div>
+    <div class="hero" id="hero"><div class="skh sk"></div><div class="skh sk"></div></div>
+    <div class="list" id="news"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+  </section>
+
+  <footer>Vyro &middot; Made by Yoolan<br>News from BBC feeds</footer>
+
+<script>
+var params = new URLSearchParams(location.search);
+document.documentElement.setAttribute('data-theme', params.get('theme') === 'light' ? 'light' : 'dark');
+var engine = params.get('engine') || 'https://duckduckgo.com/?q=';
+if (params.get('news') === '0') document.getElementById('newsBox').style.display = 'none';
+
+var now = new Date();
+var h = now.getHours();
+document.getElementById('greet').textContent = h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening');
+document.getElementById('today').textContent = now.toLocaleDateString(undefined, {weekday:'long', day:'numeric', month:'long'});
+
+function go(e) {
+  e.preventDefault();
+  var v = document.getElementById('q').value.trim();
+  if (!v) return;
+  if (v.indexOf(' ') < 0 && v.indexOf('.') > 0) { location.href = 'https://' + v.replace(/^https?:\/\//, ''); return; }
+  location.href = engine + encodeURIComponent(v);
+}
+
+function el(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text) e.textContent = text;
+  return e;
+}
+
+// ---------- favourites ----------
+var SITES = [
+  ['Google','https://www.google.com','G','#4285F4'], ['YouTube','https://m.youtube.com','▶','#FF0033'],
+  ['Wikipedia','https://en.m.wikipedia.org','W','#555B6E'], ['BBC','https://www.bbc.com/news','B','#BB1919'],
+  ['Maps','https://www.google.com/maps','M','#34A853'], ['Mail','https://mail.google.com','@','#EA4335'],
+  ['Games','games.html' + location.search,'🎮','#7B5CFF'], ['Media','vyro://media','♪','#FF5C93']
+];
+var sitesEl = document.getElementById('sites');
+SITES.forEach(function (s) {
+  var a = el('a'); a.href = s[1];
+  var d = el('div', 'dot', s[2]); d.style.background = s[3];
+  a.appendChild(d); a.appendChild(el('span', '', s[0]));
+  sitesEl.appendChild(a);
+});
+
+// ---------- weather (Open-Meteo, no key needed) ----------
+(function () {
+  var lat = params.get('lat'), lon = params.get('lon'), city = params.get('city') || '';
+  if (!lat || !lon) return;
+  var codes = function (c) {
+    if (c === 0) return ['☀️','Clear sky'];
+    if (c <= 2) return ['⛅','Partly cloudy'];
+    if (c === 3) return ['☁️','Cloudy'];
+    if (c <= 48) return ['🌫️','Foggy'];
+    if (c <= 57) return ['🌦️','Drizzle'];
+    if (c <= 67) return ['🌧️','Rain'];
+    if (c <= 77) return ['❄️','Snow'];
+    if (c <= 82) return ['🌧️','Showers'];
+    return ['⛈️','Thunderstorm'];
+  };
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon +
+        '&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto')
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      var c = j.current, w = codes(c.weather_code);
+      document.getElementById('wxIc').textContent = w[0];
+      document.getElementById('wxT').textContent = Math.round(c.temperature_2m) + '°C';
+      document.getElementById('wxC').textContent = city + ' · ' + w[1];
+      document.getElementById('wxR').innerHTML = 'H ' + Math.round(j.daily.temperature_2m_max[0]) + '° · L ' +
+        Math.round(j.daily.temperature_2m_min[0]) + '°<br>Humidity ' + c.relative_humidity_2m + '%';
+      document.getElementById('wx').style.display = 'flex';
+    }).catch(function () {});
+})();
+
+// ---------- news ----------
+var TOPICS = [['top','Top'],['africa','Africa'],['swahili','Swahili'],['business','Business'],['tech','Tech'],['sport','Sport'],['fun','Entertainment']];
+var data = null, cat = 'top';
+var chipsEl = document.getElementById('chips');
+var newsEl = document.getElementById('news');
+var heroEl = document.getElementById('hero');
+
+TOPICS.forEach(function (t) {
+  var b = el('button', 'chip' + (t[0] === cat ? ' on' : ''), t[1]);
+  b.onclick = function () {
+    cat = t[0];
+    Array.prototype.forEach.call(chipsEl.children, function (c) { c.className = 'chip'; });
+    b.className = 'chip on';
+    draw();
+  };
+  chipsEl.appendChild(b);
+});
+
+function hash(s) { var x = 0; for (var i = 0; i < s.length; i++) { x = (x * 31 + s.charCodeAt(i)) | 0; } return Math.abs(x); }
+
+// A colourful card used whenever a story has no picture (or its picture fails to load).
+function placeholder(a) {
+  var hue = hash(a.t) % 360;
+  var d = el('div', 'ph');
+  d.style.background = 'linear-gradient(135deg,hsl(' + hue + ',70%,45%),hsl(' + ((hue + 50) % 360) + ',70%,30%))';
+  return d;
+}
+
+function picture(a, holder) {
+  holder.appendChild(placeholder(a));
+  if (!a.i) return;
+  var img = document.createElement('img');
+  img.alt = '';
+  img.referrerPolicy = 'no-referrer';
+  img.onload = function () { holder.appendChild(img); };
+  var tried0 = false;
+  img.onerror = function () {
+    if (!tried0 && a.i0 && a.i0 !== a.i) { tried0 = true; img.src = a.i0; }
+  };
+  img.src = a.i;
+}
+
+function draw() {
+  var list = (data && data[cat]) || [];
+  newsEl.innerHTML = '';
+  heroEl.innerHTML = '';
+  if (!list.length) { newsEl.appendChild(el('div', 'state', 'No stories here right now.')); return; }
+  var heroes = list.slice(0, 4);
+  heroes.forEach(function (a) {
+    var s = el('a', 'slide'); s.href = a.l;
+    picture(a, s);
+    s.appendChild(el('div', 'shade'));
+    var cap = el('div', 'cap');
+    cap.appendChild(el('span', 'tag', a.s));
+    cap.appendChild(el('div', 'tt', a.t));
+    if (a.a) cap.appendChild(el('div', 'meta', a.a));
+    s.appendChild(cap);
+    heroEl.appendChild(s);
+  });
+  heroEl.scrollLeft = 0;
+  list.slice(4).forEach(function (a) {
+    var r = el('a', 'row'); r.href = a.l;
+    var th = el('div', 'thumb');
+    picture(a, th);
+    var body = el('div', 'body');
+    body.appendChild(el('div', 'tt', a.t));
+    body.appendChild(el('div', 'meta2', a.s + (a.a ? ' · ' + a.a : '')));
+    r.appendChild(th); r.appendChild(body);
+    newsEl.appendChild(r);
+  });
+}
+
+window.renderNews = function (json) {
+  try { data = JSON.parse(json); } catch (e) { return; }
+  draw();
+};
+window.newsFailed = function () {
+  if (!data) {
+    heroEl.innerHTML = '';
+    newsEl.innerHTML = '';
+    newsEl.appendChild(el('div', 'state', 'Couldn’t load the news. Check your internet connection.'));
+  }
+};
+</script>
+</body>
+</html>
